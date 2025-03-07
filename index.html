@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <style>
+        :root {
+            --primary: #7209b7;
+            --primary-light: #f5e1fd;
+            --primary-dark: #560b8a;
+            --secondary: #4cc9f0;
+            --accent: #f72585;
+            --success: #38b000;
+            --error: #ff595e;
+            --background: #f8f9fa;
+            --card: #ffffff;
+            --text: #2b2d42;
+            --text-light: #6c757d;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4361ee, #7209b7);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-attachment: fixed;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .card-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header p {
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .form-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .form-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e9ecef;
+            color: var(--text-light);
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .step-title {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .step.active .step-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .step.complete .step-number {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 0.75rem;
+            background-color: #f8f9fa;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .error-message {
+            display: none;
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+            position: relative;
+        }
+
+        .error-message::before {
+            content: "⚠️";
+            margin-right: 0.3rem;
+        }
+
+        .form-group.error .form-control {
+            border-color: var(--error);
+            background-color: #fff8f8;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .form-group.success .form-control {
+            border-color: var(--success);
+        }
+
+        .form-group.success .input-icon {
+            color: var(--success);
+        }
+
+        .password-strength {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            border-radius: 3px;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(114, 9, 183, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .success-message h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .success-message p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Added styles to make the success message more visible and prominent */
+        .success-message.show {
+            display: block !important;
+            z-index: 10;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .card-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .step-title {
+                display: none;
+            }
+            
+            .form-navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .form-navigation button {
+                width: 100%;
+            }
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: -50px;
+            left: 10%;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -70px;
+            right: 10%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="floating-shapes">
+                    <div class="shape shape-1"></div>
+                    <div class="shape shape-2"></div>
+                </div>
+                <h1>Student Registration</h1>
+                <p>Join our academic community by completing this registration form</p>
+            </div>
+            
+            <div class="card-body">
+                <div class="form-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Personal Info</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Contact Details</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Account Setup</div>
+                    </div>
+                </div>
+                
+                <form id="registrationForm" novalidate>
+                    <div class="form-section active" data-section="1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="firstName" class="form-control" placeholder="John" required>
+                                    <div class="input-icon">👤</div>
+                                </div>
+                                <div class="error-message">Please enter a valid first name (letters only)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
+                                    <div class="input-icon">👤</div>
+                                </div>
+                                <div class="error-message">Please enter a valid last name (letters only)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <div class="input-group">
+                                <input type="date" id="dateOfBirth" class="form-control" required>
+                                <div class="input-icon">📅</div>
+                            </div>
+                            <div class="error-message">Please enter a valid date of birth (you must be at least 16 years old)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studentId">Student ID</label>
+                            <div class="input-group">
+                                <input type="text" id="studentId" class="form-control" placeholder="ST12345" required>
+                                <div class="input-icon">🆔</div>
+                            </div>
+                            <div class="error-message">Please enter a valid student ID (STxxxxx format)</div>
+                        </div>
+                        
+                        <div class="form-navigation">
+                            <div></div> <!-- Empty div for flex spacing -->
+                            <button type="button" class="btn btn-primary next-step" data-next="2">
+                                Continue <span>→</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section" data-section="2">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-group">
+                                <input type="email" id="email" class="form-control" placeholder="john.doe@example.com" required>
+                                <div class="input-icon">✉️</div>
+                            </div>
+                            <div class="error-message">Please enter a valid email address</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <div class="input-group">
+                                <input type="tel" id="phone" class="form-control" placeholder="123-456-7890" required>
+                                <div class="input-icon">📱</div>
+                            </div>
+                            <div class="error-message">Please enter a valid phone number (XXX-XXX-XXXX format)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="zipCode">Zip/Postal Code</label>
+                            <div class="input-group">
+                                <input type="text" id="zipCode" class="form-control" placeholder="12345" required>
+                                <div class="input-icon">📍</div>
+                            </div>
+                            <div class="error-message">Please enter a valid zip code (5 digits)</div>
+                        </div>
+                        
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-secondary prev-step" data-prev="1">
+                                <span>←</span> Back
+                            </button>
+                            <button type="button" class="btn btn-primary next-step" data-next="3">
+                                Continue <span>→</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section" data-section="3">
+                        <div class="form-group">
+                            <label for="password">Create Password</label>
+                            <div class="input-group">
+                                <input type="password" id="password" class="form-control" placeholder="Create a strong password" required>
+                                <div class="input-icon">🔒</div>
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-bar"></div>
+                            </div>
+                            <div class="password-strength-text">Password strength</div>
+                            <div class="error-message">Password must be at least 8 characters with letters, numbers and symbols</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                                <div class="input-icon">🔒</div>
+                            </div>
+                            <div class="error-message">Passwords do not match</div>
+                        </div>
+                        
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-secondary prev-step" data-prev="2">
+                                <span>←</span> Back
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitButton">
+                                Complete Registration <span>✓</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="success-message" id="successMessage">
+                    <div class="success-icon">✓</div>
+                    <h3>Registration Successful!</h3>
+                    <p>Thank you for registering with us. Your information has been successfully validated and submitted.</p>
+                    <button type="button" class="btn btn-primary" onclick="location.reload()">
+                        Register Another Student
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const formSections = document.querySelectorAll('.form-section');
+            const steps = document.querySelectorAll('.step');
+            const nextButtons = document.querySelectorAll('.next-step');
+            const prevButtons = document.querySelectorAll('.prev-step');
+            const successMessage = document.getElementById('successMessage');
+            const passwordInput = document.getElementById('password');
+            const passwordStrengthBar = document.querySelector('.password-strength-bar');
+            const passwordStrengthText = document.querySelector('.password-strength-text');
+            const submitButton = document.getElementById('submitButton');
+            
+            // Regular expressions for validation
+            const regexPatterns = {
+                firstName: /^[A-Za-z]{2,}$/,
+                lastName: /^[A-Za-z]{2,}$/,
+                email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                phone: /^\d{3}-\d{3}-\d{4}$/,
+                password: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                studentId: /^ST\d{5}$/,
+                zipCode: /^\d{5}$/
+            };
+            
+            // Input field validations
+            const formFields = [
+                {
+                    id: 'firstName',
+                    section: 1,
+                    validate: function(value) {
+                        return regexPatterns.firstName.test(value);
+                    }
+                },
+                {
+                    id: 'lastName',
+                    section: 1,
+                    validate: function(value) {
+                        return regexPatterns.lastName.test(value);
+                    }
+                },
+                {
+                    id: 'dateOfBirth',
+                    section: 1,
+                    validate: function(value) {
+                        if (!value) return false;
+                        
+                        const dob = new Date(value);
+                        const today = new Date();
+                        const age = today.getFullYear() - dob.getFullYear();
+                        
+                        // Check if the birthday has occurred this year
+                        const hasBirthdayOccurredThisYear = 
+                            today.getMonth() > dob.getMonth() || 
+                            (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+                        
+                        const actualAge = hasBirthdayOccurredThisYear ? age : age - 1;
+                        
+                        return actualAge >= 16;
+                    }
+                },
+                {
+                    id: 'studentId',
+                    section: 1,
+                    validate: function(value) {
+                        return regexPatterns.studentId.test(value);
+                    }
+                },
+                {
+                    id: 'email',
+                    section: 2,
+                    validate: function(value) {
+                        return regexPatterns.email.test(value);
+                    }
+                },
+                {
+                    id: 'phone',
+                    section: 2,
+                    validate: function(value) {
+                        return regexPatterns.phone.test(value);
+                    }
+                },
+                {
+                    id: 'zipCode',
+                    section: 2,
+                    validate: function(value) {
+                        return regexPatterns.zipCode.test(value);
+                    }
+                },
+                {
+                    id: 'password',
+                    section: 3,
+                    validate: function(value) {
+                        return regexPatterns.password.test(value);
+                    }
+                },
+                {
+                    id: 'confirmPassword',
+                    section: 3,
+                    validate: function(value) {
+                        return value === document.getElementById('password').value && value !== '';
+                    }
+                }
+            ];
+            
+            // Add event listeners for real-time validation
+            formFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                
+                element.addEventListener('input', function() {
+                    validateField(field);
+                });
+                
+                element.addEventListener('blur', function() {
+                    validateField(field);
+                });
+            });
+            
+            // Set up step navigation
+            nextButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const currentSection = parseInt(this.getAttribute('data-next')) - 1;
+                    const nextSection = parseInt(this.getAttribute('data-next'));
+                    
+                    // Validate current section fields before proceeding
+                    if (validateSectionFields(currentSection)) {
+                        showSection(nextSection);
+                    }
+                });
+            });
+            
+            prevButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const prevSection = parseInt(this.getAttribute('data-prev'));
+                    showSection(prevSection);
+                });
+            });
+            
+            function showSection(sectionNumber) {
+                // Hide all sections
+                formSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show targeted section
+                document.querySelector(`.form-section[data-section="${sectionNumber}"]`).classList.add('active');
+                
+                // Update steps
+                steps.forEach(step => {
+                    const stepNumber = parseInt(step.getAttribute('data-step'));
+                    
+                    if (stepNumber < sectionNumber) {
+                        step.classList.add('complete');
+                        step.classList.remove('active');
+                    } else if (stepNumber === sectionNumber) {
+                        step.classList.add('active');
+                        step.classList.remove('complete');
+                    } else {
+                        step.classList.remove('active', 'complete');
+                    }
+                });
+            }
+            
+            function validateSectionFields(sectionNumber) {
+                let isValid = true;
+                
+                // Filter fields for the current section
+                const sectionFields = formFields.filter(field => field.section === sectionNumber);
+                
+                sectionFields.forEach(field => {
+                    const isFieldValid = validateField(field);
+                    isValid = isValid && isFieldValid;
+                });
+                
+                return isValid;
+            }
+            
+            // Password strength meter
+            passwordInput.addEventListener('input', function() {
+                updatePasswordStrength(this.value);
+            });
+            
+            function updatePasswordStrength(password) {
+                // Password strength calculation
+                let strength = 0;
+                let strengthText = "";
+                
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[A-Z]/)) strength += 20;
+                if (password.match(/[0-9]/)) strength += 20;
+                if (password.match(/[^A-Za-z0-9]/)) strength += 20;
+                if (password.length >= 12) strength += 15;
+                
+                passwordStrengthBar.style.width = strength + '%';
+                
+                // Change color and text based on strength
+                if (strength <= 20) {
+                    passwordStrengthBar.style.backgroundColor = '#ff595e';
+                    strengthText = "Very Weak";
+                } else if (strength <= 40) {
+                    passwordStrengthBar.style.backgroundColor = '#ff924c';
+                    strengthText = "Weak";
+                } else if (strength <= 60) {
+                    passwordStrengthBar.style.backgroundColor = '#ffca3a';
+                    strengthText = "Medium";
+                } else if (strength <= 80) {
+                    passwordStrengthBar.style.backgroundColor = '#8ac926';
+                    strengthText = "Strong";
+                } else {
+                    passwordStrengthBar.style.backgroundColor = '#38b000';
+                    strengthText = "Very Strong";
+                }
+                
+                passwordStrengthText.textContent = strengthText;
+            }
+            
+            function validateField(field) {
+                const element = document.getElementById(field.id);
+                const isValid = field.validate(element.value);
+                const formGroup = element.closest('.form-group');
+                
+                if (isValid) {
+                    formGroup.classList.remove('error');
+                    formGroup.classList.add('success');
+                } else {
+                    formGroup.classList.add('error');
+                    formGroup.classList.remove('success');
+                }
+                
+                return isValid;
+            }
+            
+            function validateAllFields() {
+                let isFormValid = true;
+                
+                formFields.forEach(field => {
+                    const isFieldValid = validateField(field);
+                    isFormValid = isFormValid && isFieldValid;
+                });
+                
+                return isFormValid;
+            }
+            
+            // Add specific submit button click handler for better reliability
+            submitButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleFormSubmission();
+            });
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleFormSubmission();
+            });
+            
+            function handleFormSubmission() {
+                if (validateAllFields()) {
+                    // If all validations pass, show success message
+                    form.style.display = 'none';
+                    successMessage.classList.add('show');
+                    
+                    // Mark all steps as complete
+                    steps.forEach(step => {
+                        step.classList.add('complete');
+                        step.classList.remove('active');
+                    });
+                    
+                    // You would typically send form data to the server here
+                    console.log('Form submitted successfully!');
+                    
+                    // Add an alert to make sure it's visible
+                    alert("Registration Successful! Thank you for registering with us.");
+                } else {
+                    // Find the first section with errors and navigate to it
+                    for (let i = 1; i <= 3; i++) {
+                        if (!validateSectionFields(i)) {
+                            showSection(i);
+                            break;
+                        }
+                    }
+                    
+                    // Focus on the first invalid field
+                    for (const field of formFields) {
+                        const element = document.getElementById(field.id);
+                        if (!field.validate(element.value)) {
+                            element.focus();
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Format phone number as user types
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function(e) {
+                // Remove all non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                
+                // Format as XXX-XXX-XXXX
+                if (value.length > 0) {
+                    if (value.length <= 3) {
+                        value = value;
+                    } else if (value.length <= 6) {
+                        value = value.slice(0, 3) + '-' + value.slice(3);
+                    } else {
+                        value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6, 10);
+                    }
+                }
+                
+                this.value = value;
+            });
+            
+            // Add sample data function for testing
+            window.fillSampleData = function() {
+                document.getElementById('firstName').value = 'John';
+                document.getElementById('lastName').value = 'Doe';
+                document.getElementById('dateOfBirth').value = '2000-01-01';
+                document.getElementById('studentId').value = 'ST12345';
+                document.getElementById('email').value = 'john.doe@example.com';
+                document.getElementById('phone').value = '123-456-7890';
+                document.getElementById('zipCode').value = '12345';
+                document.getElementById('password').value = 'Password123!';
+                document.getElementById('confirmPassword').value = 'Password123!';
+                
+                // Validate all fields
+                formFields.forEach(field => {
+                    validateField(field);
+                });
+                
+                // Update password strength
+                updatePasswordStrength(document.getElementById('password').value);
+            };
+        });
+    </script>
+</body>
+</html>
